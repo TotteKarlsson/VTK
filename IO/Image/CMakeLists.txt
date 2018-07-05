@@ -30,7 +30,7 @@ set(Module_SRCS
   vtkPostScriptWriter.cxx
   vtkSLCReader.cxx
   vtkTIFFReader.cxx
-  vtkTIFFWriter.cxx
+#  vtkTIFFWriter.cxx
   vtkVolume16Reader.cxx
   vtkVolumeReader.cxx
   vtkMRCReader.cxx

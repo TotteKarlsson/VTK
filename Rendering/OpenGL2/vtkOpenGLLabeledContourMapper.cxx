@@ -29,7 +29,7 @@
 #include "vtkTextActor3D.h"
 #include "vtkOpenGLHelper.h"
 
-
+#include "vtkPolyDataMapper.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkOpenGLLabeledContourMapper)

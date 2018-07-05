@@ -493,7 +493,7 @@ void vtkTextMapper::UpdateQuad(vtkActor2D *actor, int dpi)
     if (tren)
       {
       if (!tren->GetBoundingBox(this->TextProperty,
-                                this->Input ? this->Input : std::string(),
+                                this->Input ? std::string(this->Input) : std::string(),
                                 text_bbox, dpi))
         {
         vtkErrorMacro(<<"Error calculating bounding box.");
@@ -532,7 +532,7 @@ void vtkTextMapper::UpdateImage(int dpi)
     if (tren)
       {
       if (!tren->RenderString(this->TextProperty,
-                              this->Input ? this->Input : std::string(),
+                              this->Input ? std::string(this->Input) : std::string(),
                               this->Image.GetPointer(), this->TextDims, dpi))
         {
         vtkErrorMacro(<<"Texture generation failed.");

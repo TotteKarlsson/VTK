@@ -25,6 +25,7 @@
 #else
 # include "vtkWindows.h" // Needed to include OpenGL header on Windows.
 # include <GL/gl.h> // Include OpenGL API.
+
 #endif
 
 #endif

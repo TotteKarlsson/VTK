@@ -689,18 +689,18 @@ void vtkTIFFReader::Process(OT *outPtr, int outExtent[6], vtkIdType outIncr[3])
   // file
   this->InternalImage->Clean();
 
-  OT *outPtr2 = outPtr;
+//  OT *outPtr2 = outPtr;
   for (int idx2 = outExtent[4]; idx2 <= outExtent[5]; ++idx2)
     {
     this->ComputeInternalFileName(idx2);
     // read in a TIFF file
-    this->Process2(outPtr2, outExtent);
+//    this->Process2(outPtr2, outExtent);
     // close the TIFF file
     this->InternalImage->Clean();
 
     this->UpdateProgress((idx2 - outExtent[4])/
                          (outExtent[5] - outExtent[4] + 1.0));
-    outPtr2 += outIncr[2];
+ //   outPtr2 += outIncr[2];
     }
 }
 

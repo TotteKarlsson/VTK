@@ -55,8 +55,8 @@ int vtkExtractSelectedIds::FillInputPortInformation(
   if (port==0)
     {
     // this filter can only work with datasets.
-    info->Remove(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE());
-    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet");
+    info->Remove(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE()); 
+    info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataSet"); 
     }
   return 1;
 }
@@ -100,7 +100,7 @@ int vtkExtractSelectedIds::RequestData(
     }
   if (node->GetContentType() != vtkSelectionNode::GLOBALIDS &&
       node->GetContentType() != vtkSelectionNode::PEDIGREEIDS &&
-      node->GetContentType() != vtkSelectionNode::VALUES &&
+      node->GetContentType() != vtkSelectionNode::VALUES &&  
       node->GetContentType() != vtkSelectionNode::INDICES
       )
     {
@@ -112,7 +112,7 @@ int vtkExtractSelectedIds::RequestData(
     outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   vtkDebugMacro(<< "Extracting from dataset");
-
+  
   int fieldType = vtkSelectionNode::CELL;
   if (node->GetProperties()->Has(vtkSelectionNode::FIELD_TYPE()))
     {
@@ -122,6 +122,7 @@ int vtkExtractSelectedIds::RequestData(
     {
     case vtkSelectionNode::CELL:
       return this->ExtractCells(node, input, output);
+      break;
     case vtkSelectionNode::POINT:
       return this->ExtractPoints(node, input, output);
     }
@@ -129,7 +130,7 @@ int vtkExtractSelectedIds::RequestData(
 }
 
 // Copy the points marked as "in" and build a pointmap
-static void vtkExtractSelectedIdsCopyPoints(vtkDataSet* input,
+void vtkExtractSelectedIdsCopyPoints(vtkDataSet* input, 
   vtkDataSet* output, signed char* inArray, vtkIdType* pointMap)
 {
   vtkPoints* newPts = vtkPoints::New();
@@ -169,7 +170,7 @@ static void vtkExtractSelectedIdsCopyPoints(vtkDataSet* input,
 
 // Copy the cells marked as "in" using the given pointmap
 template <class T>
-void vtkExtractSelectedIdsCopyCells(vtkDataSet* input, T* output,
+void vtkExtractSelectedIdsCopyCells(vtkDataSet* input, T* output, 
   signed char* inArray, vtkIdType* pointMap)
 {
   vtkIdType numCells = input->GetNumberOfCells();
@@ -217,6 +218,27 @@ void vtkExtractSelectedIdsCopyCells(vtkDataSet* input, T* output,
   originalIds->Delete();
   ptIds->Delete();
 }
+
+#define vtkESI_ExtendedTemplateMacro(t1, t2, call)\
+  switch (t1)\
+    {\
+    vtkTemplateMacro(\
+      typedef VTK_TT VTK_TT1;\
+      switch (t2)\
+        {\
+        vtkTemplateMacro(\
+          typedef VTK_TT VTK_TT2;\
+          call;);\
+        }\
+    );\
+    \
+  case VTK_STRING:\
+     {\
+     typedef vtkStdString VTK_TT1;\
+     typedef vtkStdString VTK_TT2;\
+     call;\
+     }\
+    }
 
 namespace
 {
@@ -294,302 +316,7 @@ namespace
       break;
       }
     }
-
-  //---------------------
-  template<class T1, class T2>
-  void vtkExtractSelectedIdsExtractCells(
-    vtkExtractSelectedIds *self, int passThrough, int invert,
-    vtkDataSet *input, vtkIdTypeArray *idxArray,
-    vtkSignedCharArray *cellInArray, vtkSignedCharArray *pointInArray,
-    vtkIdType numIds, T1 *id, T2 *label)
-  {
-    // Reverse the "in" flag
-    signed char flag = invert ? 1 : -1;
-    flag = -flag;
-
-    vtkIdType numCells = input->GetNumberOfCells();
-    vtkIdType numPts = input->GetNumberOfPoints();
-    vtkIdList *idList = vtkIdList::New();
-    vtkIdList *ptIds = NULL;
-    char* cellCounter = NULL;
-    if (invert)
-      {
-      ptIds = vtkIdList::New();
-      cellCounter = new char[numPts];
-      for (vtkIdType i = 0; i < numPts; ++i)
-        {
-        cellCounter[i] = 0;
-        }
-      }
-
-    vtkIdType idArrayIndex = 0, labelArrayIndex = 0;
-
-    // Check each cell to see if it's selected
-    while (labelArrayIndex < numCells)
-      {
-      // Advance through the selection ids until we find
-      // one that's NOT LESS THAN the current cell label.
-      bool idLessThanLabel = false;
-      if (idArrayIndex < numIds)
-        {
-        idLessThanLabel =
-          (id[idArrayIndex] < static_cast<T1>(label[labelArrayIndex]));
-        }
-      while ((idArrayIndex < numIds) && idLessThanLabel)
-        {
-        ++idArrayIndex;
-        if (idArrayIndex >= numIds)
-          {
-          break;
-          }
-        idLessThanLabel =
-          (id[idArrayIndex] < static_cast<T1>(label[labelArrayIndex]));
-        }
-
-      if (idArrayIndex >= numIds)
-        {
-        // We're out of selection ids, so we're done.
-        break;
-        }
-      self->UpdateProgress(static_cast<double>(idArrayIndex) /
-                           (numIds * (passThrough + 1)));
-
-      // Advance through and mark all cells with a label EQUAL TO the
-      // current selection id, as well as their points.
-      bool idEqualToLabel = false;
-      if (labelArrayIndex < numCells)
-        {
-        idEqualToLabel =
-          (id[idArrayIndex] == static_cast<T1>(label[labelArrayIndex]));
-        }
-      while ((labelArrayIndex < numCells) && idEqualToLabel)
-        {
-        vtkIdType cellId = idxArray->GetValue(labelArrayIndex);
-        cellInArray->SetValue(cellId, flag);
-        input->GetCellPoints(cellId, idList);
-        if (!invert)
-          {
-          for (vtkIdType i = 0; i < idList->GetNumberOfIds(); ++i)
-            {
-            pointInArray->SetValue(idList->GetId(i), flag);
-            }
-          }
-        else
-          {
-          for (vtkIdType i = 0; i < idList->GetNumberOfIds(); ++i)
-            {
-            vtkIdType ptId = idList->GetId(i);
-            ptIds->InsertUniqueId(ptId);
-            cellCounter[ptId]++;
-            }
-          }
-        ++labelArrayIndex;
-        if (labelArrayIndex >= numCells)
-          {
-          break;
-          }
-        idEqualToLabel =
-          (id[idArrayIndex] == static_cast<T1>(label[labelArrayIndex]));
-        }
-
-      // Advance through cell labels until we find
-      // one that's NOT LESS THAN the current selection id.
-      bool labelLessThanId = false;
-      if (labelArrayIndex < numCells)
-        {
-        labelLessThanId =
-          (label[labelArrayIndex] < static_cast<T2>(id[idArrayIndex]));
-        }
-      while ((labelArrayIndex < numCells) && labelLessThanId)
-        {
-        ++labelArrayIndex;
-        if (labelArrayIndex >= numCells)
-          {
-          break;
-          }
-        labelLessThanId =
-          (label[labelArrayIndex] < static_cast<T2>(id[idArrayIndex]));
-        }
-      }
-
-    if (invert)
-      {
-      for (vtkIdType i = 0; i < ptIds->GetNumberOfIds(); ++i)
-        {
-        vtkIdType ptId = ptIds->GetId(i);
-        input->GetPointCells(ptId, idList);
-        if (cellCounter[ptId] == idList->GetNumberOfIds())
-          {
-          pointInArray->SetValue(ptId, flag);
-          }
-        }
-
-      ptIds->Delete();
-      delete [] cellCounter;
-      }
-
-    idList->Delete();
-  }
-
-  //---------------------
-  template<class T1>
-  void vtkExtractSelectedIdsExtractCellsT1(
-    vtkExtractSelectedIds *self, int passThrough, int invert,
-    vtkDataSet *input, vtkIdTypeArray *idxArray,
-    vtkSignedCharArray *cellInArray, vtkSignedCharArray *pointInArray,
-    vtkIdType numIds, T1 *id, void *labelVoid, int labelArrayType)
-  {
-    switch (labelArrayType)
-      {
-      vtkTemplateMacro(
-        vtkExtractSelectedIdsExtractCells(
-          self, passThrough, invert, input,
-          idxArray, cellInArray, pointInArray,
-          numIds, id, static_cast<VTK_TT *>(labelVoid)));
-      }
-  }
-
-  //---------------------
-  template<class T1, class T2>
-  void vtkExtractSelectedIdsExtractPoints(
-    vtkExtractSelectedIds *self,
-    int passThrough, int invert, int containingCells,
-    vtkDataSet *input, vtkIdTypeArray *idxArray,
-    vtkSignedCharArray *cellInArray, vtkSignedCharArray *pointInArray,
-    vtkIdType numIds, T1 *id, T2 *label)
-  {
-    // Reverse the "in" flag
-    signed char flag = invert ? 1 : -1;
-    flag = -flag;
-
-    vtkIdList *ptCells = 0;
-    vtkIdList *cellPts = 0;
-    if (containingCells)
-      {
-      ptCells = vtkIdList::New();
-      cellPts = vtkIdList::New();
-      }
-
-    vtkIdType numPts = input->GetNumberOfPoints();
-    vtkIdType idArrayIndex = 0, labelArrayIndex = 0;
-
-    // Check each point to see if it's selected
-    while (labelArrayIndex < numPts)
-      {
-      // Advance through the selection ids until we find
-      // one that's NOT LESS THAN the current point label.
-      bool idLessThanLabel = false;
-      if (idArrayIndex < numIds)
-        {
-        idLessThanLabel =
-          (id[idArrayIndex] < static_cast<T1>(label[labelArrayIndex]));
-        }
-      while ((idArrayIndex < numIds) && idLessThanLabel)
-        {
-        ++idArrayIndex;
-        if (idArrayIndex >= numIds)
-          {
-          break;
-          }
-        idLessThanLabel =
-          (id[idArrayIndex] < static_cast<T1>(label[labelArrayIndex]));
-        }
-
-      self->UpdateProgress(static_cast<double>(idArrayIndex) /
-                           (numIds * (passThrough + 1)));
-      if (idArrayIndex >= numIds)
-        {
-        // We're out of selection ids, so we're done.
-        break;
-        }
-
-      // Advance through and mark all points with a label EQUAL TO the
-      // current selection id, as well as their cells.
-      bool idEqualToLabel = false;
-      if (labelArrayIndex < numPts)
-        {
-        idEqualToLabel =
-          (id[idArrayIndex] == static_cast<T1>(label[labelArrayIndex]));
-        }
-      while ((labelArrayIndex < numPts) && idEqualToLabel)
-        {
-        vtkIdType ptId = idxArray->GetValue(labelArrayIndex);
-        pointInArray->SetValue(ptId, flag);
-        if (containingCells)
-          {
-          input->GetPointCells(ptId, ptCells);
-          for (vtkIdType i = 0; i < ptCells->GetNumberOfIds(); ++i)
-            {
-            vtkIdType cellId = ptCells->GetId(i);
-            if (!passThrough && !invert &&
-                cellInArray->GetValue(cellId) != flag)
-              {
-              input->GetCellPoints(cellId, cellPts);
-              for (vtkIdType j = 0; j < cellPts->GetNumberOfIds(); ++j)
-                {
-                pointInArray->SetValue(cellPts->GetId(j), flag);
-                }
-              }
-            cellInArray->SetValue(cellId, flag);
-            }
-          }
-        ++labelArrayIndex;
-        if (labelArrayIndex >= numPts)
-          {
-          break;
-          }
-        idEqualToLabel =
-          (id[idArrayIndex] == static_cast<T1>(label[labelArrayIndex]));
-        }
-
-      // Advance through point labels until we find
-      // one that's NOT LESS THAN the current selection id.
-      bool labelLessThanId = false;
-      if (labelArrayIndex < numPts)
-        {
-        labelLessThanId =
-          (label[labelArrayIndex] < static_cast<T2>(id[idArrayIndex]));
-        }
-      while ((labelArrayIndex < numPts) && labelLessThanId)
-        {
-        ++labelArrayIndex;
-        if (labelArrayIndex >= numPts)
-          {
-          break;
-          }
-        labelLessThanId =
-          (label[labelArrayIndex] < static_cast<T2>(id[idArrayIndex]));
-        }
-      }
-
-    if (containingCells)
-      {
-      ptCells->Delete();
-      cellPts->Delete();
-      }
-  }
-
-  //---------------------
-  template<class T1>
-  void vtkExtractSelectedIdsExtractPointsT1(
-    vtkExtractSelectedIds *self,
-    int passThrough, int invert, int containingCells,
-    vtkDataSet *input, vtkIdTypeArray *idxArray,
-    vtkSignedCharArray *cellInArray, vtkSignedCharArray *pointInArray,
-    vtkIdType numIds, T1 *id, void *labelVoid, int labelArrayType)
-  {
-    switch (labelArrayType)
-      {
-      vtkTemplateMacro(
-        vtkExtractSelectedIdsExtractPoints(
-          self, passThrough, invert, containingCells, input,
-          idxArray, cellInArray, pointInArray,
-          numIds, id, static_cast<VTK_TT *>(labelVoid)));
-      }
-  }
-
-} // end anonymous namespace
-
+};
 //----------------------------------------------------------------------------
 int vtkExtractSelectedIds::ExtractCells(
   vtkSelectionNode *sel,  vtkDataSet *input,
@@ -657,8 +384,8 @@ int vtkExtractSelectedIds::ExtractCells(
     //user chose a specific label array
     labelArray = input->GetCellData()->GetAbstractArray(
         sel->GetSelectionList()->GetName());
-    }
-
+    }    
+  
   if (labelArray == NULL && selType != vtkSelectionNode::INDICES)
     {
     return 1;
@@ -673,7 +400,7 @@ int vtkExtractSelectedIds::ExtractCells(
     }
 
   if (labelArray)
-    {
+    {    
     int component_no = 0;
     if (sel->GetProperties()->Has(vtkSelectionNode::COMPONENT_NUMBER()))
       {
@@ -685,7 +412,7 @@ int vtkExtractSelectedIds::ExtractCells(
         }
       }
 
-    vtkAbstractArray* sortedArray =
+    vtkAbstractArray* sortedArray = 
       vtkAbstractArray::CreateArray(labelArray->GetDataType());
     vtkESIDeepCopy(sortedArray, labelArray, component_no);
     vtkSortDataArray::Sort(sortedArray, idxArray);
@@ -698,12 +425,27 @@ int vtkExtractSelectedIds::ExtractCells(
     labelArray->Register(NULL);
     }
 
-  vtkIdType numIds = 0;
+  // Reverse the "in" flag
+  flag = -flag;
+
+  vtkIdList *ptIds = NULL;
+  char* cellCounter = NULL;
+  if (invert)
+    {
+    ptIds = vtkIdList::New();
+    cellCounter = new char[numPts];
+    for (i = 0; i < numPts; ++i)
+      {
+      cellCounter[i] = 0;
+      }
+    }
+  vtkIdList *idList = vtkIdList::New();
+  vtkIdType numIds = 0, ptId, cellId, idArrayIndex = 0, labelArrayIndex = 0;
   vtkAbstractArray* idArray = sel->GetSelectionList();
   if (idArray)
     {
     numIds = idArray->GetNumberOfTuples();
-    vtkAbstractArray* sortedArray =
+    vtkAbstractArray* sortedArray = 
       vtkAbstractArray::CreateArray(idArray->GetDataType());
     sortedArray->DeepCopy(idArray);
     vtkSortDataArray::SortArrayByComponent(sortedArray, 0);
@@ -714,16 +456,33 @@ int vtkExtractSelectedIds::ExtractCells(
     {
     labelArray->Delete();
     idxArray->Delete();
+    idList->Delete();
+    if (ptIds)
+      {
+      ptIds->Delete();
+      }
+    if (cellCounter)
+      {
+      delete[] cellCounter;
+      }
     return 1;
     }
-
+  
   // Array types must match if they are string arrays.
   if (vtkStringArray::SafeDownCast(labelArray) &&
     vtkStringArray::SafeDownCast(idArray) == NULL)
     {
     labelArray->Delete();
     idxArray->Delete();
-    idArray->Delete();
+    idList->Delete();
+    if (ptIds)
+      {
+      ptIds->Delete();
+      }
+    if (cellCounter)
+      {
+      delete[] cellCounter;
+      }
     vtkWarningMacro(
       "Array types don't match. They must match for vtkStringArray.");
     return 0;
@@ -734,41 +493,159 @@ int vtkExtractSelectedIds::ExtractCells(
   int idArrayType = idArray->GetDataType();
   int labelArrayType = labelArray->GetDataType();
 
-  switch (idArrayType)
+  // Check each cell to see if it's selected
+  while (labelArrayIndex < numCells)
     {
-    vtkTemplateMacro(
-      vtkExtractSelectedIdsExtractCellsT1(
-        this, passThrough, invert, input,
-        idxArray, cellInArray, pointInArray, numIds,
-        static_cast<VTK_TT *>(idVoid), labelVoid, labelArrayType));
-    case VTK_STRING:
-      vtkExtractSelectedIdsExtractCells(
-        this, passThrough, invert, input,
-        idxArray, cellInArray, pointInArray, numIds,
-        static_cast<vtkStdString *>(idVoid),
-        static_cast<vtkStdString *>(labelVoid));
+    // Advance through the selection ids until we find
+    // one that's NOT LESS THAN the current cell label.
+    bool idLessThanLabel = false;
+    if (idArrayIndex < numIds)
+      {
+//mtk
+//      vtkESI_ExtendedTemplateMacro(
+//        idArrayType, labelArrayType,
+//        idLessThanLabel = 
+//        (static_cast<VTK_TT1*>(idVoid)[idArrayIndex]) <
+//        static_cast<VTK_TT1>(
+//          (static_cast<VTK_TT2*>(labelVoid)[labelArrayIndex])));
+      }
+    while ((idArrayIndex < numIds) && idLessThanLabel)
+      {
+      ++idArrayIndex;
+      if (idArrayIndex >= numIds)
+        {
+        break;
+        }
+//mtk
+//      vtkESI_ExtendedTemplateMacro(
+//        idArrayType, labelArrayType,
+//        idLessThanLabel = 
+//        static_cast<VTK_TT1*>(idVoid)[idArrayIndex] <
+//        static_cast<VTK_TT1>(
+//          static_cast<VTK_TT2*>(labelVoid)[labelArrayIndex]));
+      }
+
+    if (idArrayIndex >= numIds)
+      {
+      // We're out of selection ids, so we're done.
+      break;
+      }
+    this->UpdateProgress(static_cast<double>(idArrayIndex) / (numIds * (passThrough + 1)));
+
+    // Advance through and mark all cells with a label EQUAL TO the
+    // current selection id, as well as their points.
+    bool idEqualToLabel = false;
+    if (labelArrayIndex < numCells)
+      {
+//mtk
+//      vtkESI_ExtendedTemplateMacro(
+//        idArrayType, labelArrayType,
+//        idEqualToLabel = 
+//        static_cast<VTK_TT1*>(idVoid)[idArrayIndex] ==
+//        static_cast<VTK_TT1>(
+//          static_cast<VTK_TT2*>(labelVoid)[labelArrayIndex]));
+      }
+    while ((labelArrayIndex < numCells) && idEqualToLabel)
+      {
+      cellId = idxArray->GetValue(labelArrayIndex);
+      cellInArray->SetValue(cellId, flag);
+      input->GetCellPoints(cellId, idList);
+      if (!invert)
+        {
+        for (i = 0; i < idList->GetNumberOfIds(); ++i)
+          {
+          pointInArray->SetValue(idList->GetId(i), flag);
+          }
+        }
+      else
+        {
+        for (i = 0; i < idList->GetNumberOfIds(); ++i)
+          {
+          ptId = idList->GetId(i);
+          ptIds->InsertUniqueId(ptId);
+          cellCounter[ptId]++;
+          }
+        }
+      ++labelArrayIndex;
+      if (labelArrayIndex >= numCells)
+        {
+        break;
+        }
+//mtk
+//      vtkESI_ExtendedTemplateMacro(
+//        idArrayType, labelArrayType,
+//        idEqualToLabel = 
+//        static_cast<VTK_TT1*>(idVoid)[idArrayIndex] ==
+//        static_cast<VTK_TT1>(
+//          static_cast<VTK_TT2*>(labelVoid)[labelArrayIndex]));
+      }
+      
+
+    // Advance through cell labels until we find
+    // one that's NOT LESS THAN the current selection id.
+    bool labelLessThanId = false;
+    if (labelArrayIndex < numCells)
+      {
+ //     vtkESI_ExtendedTemplateMacro(
+ //       labelArrayType, idArrayType,
+ //       labelLessThanId = 
+ //       static_cast<VTK_TT1*>(labelVoid)[labelArrayIndex] <
+ //       static_cast<VTK_TT1>(
+ //         static_cast<VTK_TT2*>(idVoid)[idArrayIndex]));
+      }
+    while ((labelArrayIndex < numCells) && labelLessThanId)
+      {
+      ++labelArrayIndex;
+      if (labelArrayIndex >= numCells)
+        {
+        break;
+        }
+//     vtkESI_ExtendedTemplateMacro(labelArrayType, idArrayType,
+//       labelLessThanId = 
+//       static_cast<VTK_TT1*>(labelVoid)[labelArrayIndex] <
+//       static_cast<VTK_TT1>(
+//         static_cast<VTK_TT2*>(idVoid)[idArrayIndex]));
+      }
     }
 
   idArray->Delete();
+
+  if (invert)
+    {
+    for (i = 0; i < ptIds->GetNumberOfIds(); ++i)
+      {
+      ptId = ptIds->GetId(i);
+      input->GetPointCells(ptId, idList);
+      if (cellCounter[ptId] == idList->GetNumberOfIds())
+        {
+        pointInArray->SetValue(ptId, flag);
+        }
+      }
+  
+    ptIds->Delete();
+    delete [] cellCounter;
+    }
+
+  idList->Delete();
   idxArray->Delete();
   labelArray->Delete();
 
   if (!passThrough)
     {
     vtkIdType *pointMap = new vtkIdType[numPts]; // maps old point ids into new
-    vtkExtractSelectedIdsCopyPoints(input, output,
+    vtkExtractSelectedIdsCopyPoints(input, output, 
       pointInArray->GetPointer(0), pointMap);
-    this->UpdateProgress(0.75);
+    this->UpdateProgress(0.75);    
     if (output->GetDataObjectType() == VTK_POLY_DATA)
       {
-      vtkExtractSelectedIdsCopyCells<vtkPolyData>(input,
-        vtkPolyData::SafeDownCast(output),
+      vtkExtractSelectedIdsCopyCells<vtkPolyData>(input, 
+        vtkPolyData::SafeDownCast(output), 
         cellInArray->GetPointer(0), pointMap);
       }
     else
       {
-      vtkExtractSelectedIdsCopyCells<vtkUnstructuredGrid>(input,
-        vtkUnstructuredGrid::SafeDownCast(output),
+      vtkExtractSelectedIdsCopyCells<vtkUnstructuredGrid>(input, 
+        vtkUnstructuredGrid::SafeDownCast(output), 
         cellInArray->GetPointer(0), pointMap);
       }
     delete [] pointMap;
@@ -865,7 +742,7 @@ int vtkExtractSelectedIds::ExtractPoints(
     {
     return 1;
     }
-
+  
   vtkIdTypeArray *idxArray = vtkIdTypeArray::New();
   idxArray->SetNumberOfComponents(1);
   idxArray->SetNumberOfTuples(numPts);
@@ -887,7 +764,7 @@ int vtkExtractSelectedIds::ExtractPoints(
         }
       }
 
-    vtkAbstractArray* sortedArray =
+    vtkAbstractArray* sortedArray = 
       vtkAbstractArray::CreateArray(labelArray->GetDataType());
     vtkESIDeepCopy(sortedArray, labelArray, component_no);
     vtkSortDataArray::Sort(sortedArray, idxArray);
@@ -900,12 +777,19 @@ int vtkExtractSelectedIds::ExtractPoints(
     labelArray->Register(NULL);
     }
 
-  vtkIdType numIds = 0;
+  // Reverse the "in" flag
+  flag = -flag;
+
+  vtkIdList *ptCells = vtkIdList::New();
+  vtkIdList *cellPts = vtkIdList::New();
+  vtkIdType numIds = 0, ptId, cellId, idArrayIndex = 0, labelArrayIndex = 0;
   vtkAbstractArray* idArray = sel->GetSelectionList();
   if (idArray == NULL)
     {
     labelArray->Delete();
     idxArray->Delete();
+    ptCells->Delete();
+    cellPts->Delete();
     return 1;
     }
 
@@ -917,11 +801,13 @@ int vtkExtractSelectedIds::ExtractPoints(
       "Array types don't match. They must match for vtkStringArray.");
     labelArray->Delete();
     idxArray->Delete();
+    ptCells->Delete();
+    cellPts->Delete();
     return 0;
     }
 
   numIds = idArray->GetNumberOfTuples();
-  vtkAbstractArray* sortedArray =
+  vtkAbstractArray* sortedArray = 
     vtkAbstractArray::CreateArray(idArray->GetDataType());
   sortedArray->DeepCopy(idArray);
   vtkSortDataArray::SortArrayByComponent(sortedArray, 0);
@@ -932,69 +818,155 @@ int vtkExtractSelectedIds::ExtractPoints(
   int idArrayType = idArray->GetDataType();
   int labelArrayType = labelArray->GetDataType();
 
-  switch (idArrayType)
+  // Check each point to see if it's selected
+  while (labelArrayIndex < numPts)
     {
-    vtkTemplateMacro(
-      vtkExtractSelectedIdsExtractPointsT1(
-        this, passThrough, invert, containingCells, input,
-        idxArray, cellInArray, pointInArray, numIds,
-        static_cast<VTK_TT *>(idVoid), labelVoid, labelArrayType));
-    case VTK_STRING:
-      vtkExtractSelectedIdsExtractPoints(
-        this, passThrough, invert, containingCells, input,
-        idxArray, cellInArray, pointInArray, numIds,
-        static_cast<vtkStdString *>(idVoid),
-        static_cast<vtkStdString *>(labelVoid));
+    // Advance through the selection ids until we find
+    // one that's NOT LESS THAN the current point label.
+    bool idLessThanLabel = false;
+    if (idArrayIndex < numIds)
+      {
+//      vtkESI_ExtendedTemplateMacro(
+//        idArrayType, labelArrayType,
+//        idLessThanLabel = 
+//        static_cast<VTK_TT1*>(idVoid)[idArrayIndex] <
+//        static_cast<VTK_TT1>(
+//          static_cast<VTK_TT2*>(labelVoid)[labelArrayIndex]));
+      }
+    while ((idArrayIndex < numIds) && idLessThanLabel)
+      {
+      ++idArrayIndex;
+      if (idArrayIndex >= numIds)
+        {
+        break;
+        }
+//      vtkESI_ExtendedTemplateMacro(
+//        idArrayType, labelArrayType,
+//        idLessThanLabel = 
+//        static_cast<VTK_TT1*>(idVoid)[idArrayIndex] <
+//        static_cast<VTK_TT1>(
+//          static_cast<VTK_TT2*>(labelVoid)[labelArrayIndex]));
+      }
+
+    this->UpdateProgress(static_cast<double>(idArrayIndex) / (numIds * (passThrough + 1)));
+    if (idArrayIndex >= numIds)
+      {
+      // We're out of selection ids, so we're done.
+      break;
+      }
+
+    // Advance through and mark all points with a label EQUAL TO the
+    // current selection id, as well as their cells.
+    bool idEqualToLabel = false;
+    if (labelArrayIndex < numPts)
+      {
+//      vtkESI_ExtendedTemplateMacro(
+//        idArrayType, labelArrayType,
+//        idEqualToLabel = 
+//        static_cast<VTK_TT1*>(idVoid)[idArrayIndex] ==
+//        static_cast<VTK_TT1>(
+//          static_cast<VTK_TT2*>(labelVoid)[labelArrayIndex]));
+      }
+    while ((labelArrayIndex < numPts) && idEqualToLabel)
+      {
+      ptId = idxArray->GetValue(labelArrayIndex);
+      pointInArray->SetValue(ptId, flag);
+      if (containingCells)
+        {
+        for (vtkIdType j = 0; j < input->GetNumberOfPoints(); j++)
+          {
+          input->GetPointCells(ptId, ptCells);
+          for (i = 0; i < ptCells->GetNumberOfIds(); ++i)
+            {
+            cellId = ptCells->GetId(i);
+            if (!passThrough && !invert && cellInArray->GetValue(cellId) != flag)
+              {
+              input->GetCellPoints(cellId, cellPts);
+              for (j = 0; j < cellPts->GetNumberOfIds(); ++j)
+                {
+                pointInArray->SetValue(cellPts->GetId(j), flag);
+                }
+              }
+            cellInArray->SetValue(cellId, flag);
+            }
+          }
+        }
+      ++labelArrayIndex;
+      if (labelArrayIndex >= numPts)
+        {
+        break;
+        }
+//      vtkESI_ExtendedTemplateMacro(
+//        idArrayType, labelArrayType,
+//        idEqualToLabel = 
+//        static_cast<VTK_TT1*>(idVoid)[idArrayIndex] ==
+//        static_cast<VTK_TT1>(
+//          static_cast<VTK_TT2*>(labelVoid)[labelArrayIndex]));
+      }
+
+    // Advance through point labels until we find
+    // one that's NOT LESS THAN the current selection id.
+    bool labelLessThanId = false;
+    if (labelArrayIndex < numPts)
+      {
+//      vtkESI_ExtendedTemplateMacro(
+//        labelArrayType, idArrayType,
+//        labelLessThanId = 
+//        static_cast<VTK_TT1*>(labelVoid)[labelArrayIndex] <
+//        static_cast<VTK_TT1>(
+//          static_cast<VTK_TT2*>(idVoid)[idArrayIndex]));
+      }
+    while ((labelArrayIndex < numPts) && labelLessThanId)
+      {
+      ++labelArrayIndex;
+      if (labelArrayIndex >= numPts)
+        {
+        break;
+        }
+//      vtkESI_ExtendedTemplateMacro(labelArrayType, idArrayType,
+//        labelLessThanId = 
+//        static_cast<VTK_TT1*>(labelVoid)[labelArrayIndex] <
+//        static_cast<VTK_TT1>(
+//          static_cast<VTK_TT2*>(idVoid)[idArrayIndex]));
+      }
     }
 
   idArray->Delete();
+
+  ptCells->Delete();
+  cellPts->Delete();
   idxArray->Delete();
   labelArray->Delete();
 
   if (!passThrough)
     {
     vtkIdType *pointMap = new vtkIdType[numPts]; // maps old point ids into new
-    vtkExtractSelectedIdsCopyPoints(input, output,
+    vtkExtractSelectedIdsCopyPoints(input, output, 
       pointInArray->GetPointer(0), pointMap);
     this->UpdateProgress(0.75);
     if (containingCells)
       {
       if (output->GetDataObjectType() == VTK_POLY_DATA)
         {
-        vtkExtractSelectedIdsCopyCells<vtkPolyData>(input,
-          vtkPolyData::SafeDownCast(output), cellInArray->GetPointer(0),
+        vtkExtractSelectedIdsCopyCells<vtkPolyData>(input, 
+          vtkPolyData::SafeDownCast(output), cellInArray->GetPointer(0), 
           pointMap);
         }
       else
         {
-        vtkExtractSelectedIdsCopyCells<vtkUnstructuredGrid>(input,
-          vtkUnstructuredGrid::SafeDownCast(output),
+        vtkExtractSelectedIdsCopyCells<vtkUnstructuredGrid>(input, 
+          vtkUnstructuredGrid::SafeDownCast(output), 
           cellInArray->GetPointer(0), pointMap);
         }
       }
     else
       {
       numPts = output->GetNumberOfPoints();
-      if (output->GetDataObjectType() == VTK_POLY_DATA)
+      vtkUnstructuredGrid* outputUG = vtkUnstructuredGrid::SafeDownCast(output);
+      outputUG->Allocate(numPts);
+      for (i = 0; i < numPts; ++i)
         {
-        vtkPolyData* outputPD = vtkPolyData::SafeDownCast(output);
-        vtkCellArray *newVerts = vtkCellArray::New();
-        newVerts->Allocate(newVerts->EstimateSize(numPts,1));
-        for (i = 0; i < numPts; ++i)
-          {
-          newVerts->InsertNextCell(1, &i);
-          }
-        outputPD->SetVerts(newVerts);
-        newVerts->Delete();
-        }
-      else
-        {
-        vtkUnstructuredGrid* outputUG = vtkUnstructuredGrid::SafeDownCast(output);
-        outputUG->Allocate(numPts);
-        for (i = 0; i < numPts; ++i)
-          {
-          outputUG->InsertNextCell(VTK_VERTEX, 1, &i);
-          }
+        outputUG->InsertNextCell(VTK_VERTEX, 1, &i);
         }
       }
       this->UpdateProgress(1.0);
@@ -1010,3 +982,4 @@ void vtkExtractSelectedIds::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
 }
+

@@ -52,7 +52,7 @@
 #include "vtkUnsignedIntArray.h"
 #include "vtkValuePass.h"
 
-#include "vtkShadowMapPass.h"
+//#include "vtkShadowMapPass.h"
 
 // Bring in our fragment lit shader symbols.
 #include "vtkPolyDataVS.h"
@@ -597,19 +597,19 @@ void vtkOpenGLPolyDataMapper::ReplaceShaderLight(
 
   // check for shadow maps
   std::string shadowFactor = "";
-  if (info && info->Has(vtkShadowMapPass::ShadowMapPass()))
-    {
-    vtkShadowMapPass *smp = vtkShadowMapPass::SafeDownCast(
-      info->Get(vtkShadowMapPass::ShadowMapPass()));
-    if (smp)
-      {
-      vtkShaderProgram::Substitute(FSSource,"//VTK::Light::Dec",
-        smp->GetFragmentDeclaration(), false);
-      vtkShaderProgram::Substitute(FSSource,"//VTK::Light::Impl",
-        smp->GetFragmentImplementation(), false);
-      shadowFactor = "*factors[lightNum]";
-      }
-    }
+//  if (info && info->Has(vtkShadowMapPass::ShadowMapPass()))
+//    {
+//    vtkShadowMapPass *smp = vtkShadowMapPass::SafeDownCast(
+//      info->Get(vtkShadowMapPass::ShadowMapPass()));
+//    if (smp)
+//      {
+//      vtkShaderProgram::Substitute(FSSource,"//VTK::Light::Dec",
+//        smp->GetFragmentDeclaration(), false);
+//      vtkShaderProgram::Substitute(FSSource,"//VTK::Light::Impl",
+//        smp->GetFragmentImplementation(), false);
+//      shadowFactor = "*factors[lightNum]";
+//      }
+//    }
 
   // If rendering, set diffuse and specular colors to pure white
   if (info && info->Has(vtkLightingMapPass::RENDER_LUMINANCE()))
@@ -1643,15 +1643,15 @@ void vtkOpenGLPolyDataMapper::SetLightingShaderParameters(
 
   // check for shadow maps
   vtkInformation *info = actor->GetPropertyKeys();
-  if (info && info->Has(vtkShadowMapPass::ShadowMapPass()))
-    {
-    vtkShadowMapPass *smp = vtkShadowMapPass::SafeDownCast(
-      info->Get(vtkShadowMapPass::ShadowMapPass()));
-    if (smp)
-      {
-      smp->SetUniforms(program);
-      }
-    }
+//  if (info && info->Has(vtkShadowMapPass::ShadowMapPass()))
+//    {
+//    vtkShadowMapPass *smp = vtkShadowMapPass::SafeDownCast(
+//      info->Get(vtkShadowMapPass::ShadowMapPass()));
+//    if (smp)
+//      {
+//      smp->SetUniforms(program);
+//      }
+//    }
 
   // for lightkit case there are some parameters to set
   vtkCamera *cam = ren->GetActiveCamera();

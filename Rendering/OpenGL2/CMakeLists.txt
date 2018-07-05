@@ -16,7 +16,7 @@ set(Module_SRCS
   vtkCameraPass.cxx
   vtkClearRGBPass.cxx
   vtkClearZPass.cxx
-  vtkCompositePolyDataMapper2.cxx
+#  vtkCompositePolyDataMapper2.cxx
   vtkDefaultPass.cxx
   vtkDepthOfFieldPass.cxx
   vtkDepthImageProcessingPass.cxx
@@ -63,7 +63,7 @@ set(Module_SRCS
   vtkShader.cxx
   vtkShaderProgram.cxx
   vtkShadowMapBakerPass.cxx
-  vtkShadowMapPass.cxx
+#  vtkShadowMapPass.cxx
   vtkSobelGradientMagnitudePass.cxx
   vtkTextureObject.cxx
   vtkTextureUnitManager.cxx

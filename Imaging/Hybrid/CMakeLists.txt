@@ -4,9 +4,9 @@ set(Module_SRCS
   vtkVoxelModeller.cxx
   vtkSurfaceReconstructionFilter.cxx
   vtkFastSplatter.cxx
-  vtkGaussianSplatter.cxx
-  vtkCheckerboardSplatter.cxx
-  vtkSampleFunction.cxx
+#  vtkGaussianSplatter.cxx
+#  vtkCheckerboardSplatter.cxx
+#  vtkSampleFunction.cxx
   vtkPointLoad.cxx
   vtkImageCursor3D.cxx
   vtkImageRectilinearWipe.cxx

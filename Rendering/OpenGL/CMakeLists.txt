@@ -88,7 +88,7 @@ set(Module_SRCS
   vtkShader2Collection.cxx
   vtkShaderProgram2.cxx
   vtkShadowMapBakerPass.cxx
-  vtkShadowMapPass.cxx
+#  vtkShadowMapPass.cxx
   vtkSobelGradientMagnitudePass.cxx
   vtkStandardPolyDataPainter.cxx
   vtkTStripsPainter.cxx

@@ -9,12 +9,14 @@ set(common_SRCS src/glew.c)
 
 set_source_files_properties(${common_SRCS}
     PROPERTIES
-      COMPILE_DEFINITIONS "GLEW_NO_GLU")
+      COMPILE_DEFINITIONS "GLEW_NO_GLU" )
 
 # GLEW with OSMesa only works on Linux systems right now.
 if(VTK_USE_OSMESA AND UNIX AND NOT APPLE)
   add_definitions(-DGLEW_OSMESA)
 endif()
+
+add_definitions(-DGLEW_BUILD)
 
 if(VTK_USE_OFFSCREEN_EGL)
   add_definitions(-DVTK_USE_OFFSCREEN_EGL)

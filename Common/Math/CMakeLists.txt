@@ -1,5 +1,5 @@
 set(Module_SRCS
-  vtkAmoebaMinimizer.cxx
+#  vtkAmoebaMinimizer.cxx
   vtkFunctionSet.cxx
   vtkInitialValueProblemSolver.cxx
   vtkMatrix3x3.cxx

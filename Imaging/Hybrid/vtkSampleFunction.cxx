@@ -12,6 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+#include <windows.h>
 #include "vtkSampleFunction.h"
 
 #include "vtkDoubleArray.h"

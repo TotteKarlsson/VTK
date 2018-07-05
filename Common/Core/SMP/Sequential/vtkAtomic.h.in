@@ -61,6 +61,11 @@
 # if VTK_SIZEOF_VOID_P == 8
 #   define VTK_WINDOWS_ATOMICS_64
 # endif
+#elif defined(_WIN32) && defined(__BORLANDC__)
+# define VTK_WINDOWS_ATOMICS_32
+# if VTK_SIZEOF_VOID_P == 8
+#   define VTK_WINDOWS_ATOMICS_64
+# endif
 #endif
 
 

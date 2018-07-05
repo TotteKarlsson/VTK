@@ -771,7 +771,7 @@ namespace vtkvolume
             \n    {\
             \n    return computeLighting(vec4(texture2D(\
             \n      in_colorTransferFunc");
-          shaderStr += (i == 0 ? "" : toString.str());
+          shaderStr += (i == 0 ? std::string("") : toString.str());
           shaderStr += std::string(", vec2(\
             \n      scalar[" + toString.str() + "],0.0)).xyz,\
             \n      opacity));\
@@ -839,7 +839,7 @@ namespace vtkvolume
           shaderStr += std::string("\
             \n    {\
             \n    return texture2D(in_opacityTransferFunc");
-          shaderStr += (i == 0 ? "" : toString.str());
+          shaderStr += (i == 0 ? std::string("") : toString.str());
           shaderStr += std::string(",vec2(scalar[" + toString.str() + "],0)).r;\
             \n    }");
 

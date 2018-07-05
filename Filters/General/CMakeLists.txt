@@ -47,7 +47,7 @@ set(Module_SRCS
   vtkOBBTree.cxx
   vtkPassThrough.cxx
   vtkPolyDataStreamer.cxx
-  vtkPolyDataToReebGraphFilter.cxx
+  #vtkPolyDataToReebGraphFilter.cxx
   vtkProbePolyhedron.cxx
   vtkQuadraturePointInterpolator.cxx
   vtkQuadraturePointsGenerator.cxx
@@ -78,14 +78,14 @@ set(Module_SRCS
   vtkUncertaintyTubeFilter.cxx
   vtkVertexGlyphFilter.cxx
   vtkVolumeContourSpectrumFilter.cxx
-  vtkVoxelContoursToSurfaceFilter.cxx
+#  vtkVoxelContoursToSurfaceFilter.cxx
   vtkWarpLens.cxx
   vtkWarpScalar.cxx
   vtkWarpTo.cxx
   vtkWarpVector.cxx
-  vtkYoungsMaterialInterface.cxx
+#  vtkYoungsMaterialInterface.cxx
 
-  vtkMarchingContourFilter.cxx
+#  vtkMarchingContourFilter.cxx
 
   # Move to FiltersGeometry
   #vtkDataSetSurfaceFilter.cxx # Needs vtkStructuredGridGeometryFilter - Geometry

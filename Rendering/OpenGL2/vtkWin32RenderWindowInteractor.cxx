@@ -12,10 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include <stdio.h>
+//#include <windows.h>
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <cstdint>
 
 
 #ifndef _WIN32_WINNT
@@ -24,6 +25,7 @@
 #endif
 
 #include "vtkWin32OpenGLRenderWindow.h"
+# pragma comment(lib, "p:/builds/bcc32/vtkXX/lib/vtkglew-7.0.lib")
 
 // Mouse wheel support
 // In an ideal world we would just have to include <zmouse.h>, but it is not

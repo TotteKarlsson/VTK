@@ -124,7 +124,9 @@ public:
 
   vtkTypedDataArrayIterator operator++(int)
   {
+#if !defined(__BORLANDC__)
     return vtkTypedDataArrayIterator(this->Data, this->Index++);
+#endif    
   }
 
   vtkTypedDataArrayIterator operator--(int)
@@ -134,7 +136,9 @@ public:
 
   vtkTypedDataArrayIterator operator+(const difference_type& n) const
   {
+#if !defined(__BORLANDC__)
     return vtkTypedDataArrayIterator(this->Data, this->Index + n);
+#endif    
   }
 
   vtkTypedDataArrayIterator operator-(const difference_type& n) const

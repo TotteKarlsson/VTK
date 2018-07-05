@@ -26,6 +26,7 @@
 
 #include <math.h>
 #include <sstream>
+#include <cstdint>
 
 #include "vtkOpenGL.h"
 #include "vtkOpenGLError.h"

@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkRenderPass.h"
 #include "vtkRenderState.h"
 #include "vtkShadowMapBakerPass.h"
-#include "vtkShadowMapPass.h"
+//#include "vtkShadowMapPass.h"
 #include "vtkTexture.h"
 #include "vtkTextureObject.h"
 #include "vtkTexturedActor2D.h"
@@ -189,19 +189,19 @@ int vtkOpenGLRenderer::UpdateGeometry()
 
   // if we are suing shadows then let the renderpasses handle it
   // for opaque and translucent
-  if (this->UseShadows)
-    {
-    if (!this->ShadowMapPass)
-      {
-      this->ShadowMapPass = vtkShadowMapPass::New();
-      }
-    vtkRenderState s(this);
-    s.SetPropArrayAndCount(this->PropArray, this->PropArrayCount);
-    //s.SetFrameBuffer(0);
-    this->ShadowMapPass->GetShadowMapBakerPass()->Render(&s);
-    this->ShadowMapPass->Render(&s);
-    }
-  else
+//  if (this->UseShadows)
+//    {
+//    if (!this->ShadowMapPass)
+//      {
+//      this->ShadowMapPass = vtkShadowMapPass::New();
+//      }
+//    vtkRenderState s(this);
+//    s.SetPropArrayAndCount(this->PropArray, this->PropArrayCount);
+//    //s.SetFrameBuffer(0);
+//    this->ShadowMapPass->GetShadowMapBakerPass()->Render(&s);
+//    this->ShadowMapPass->Render(&s);
+//    }
+//  else
     {
     // loop through props and give them a chance to
     // render themselves as opaque geometry
@@ -512,10 +512,10 @@ void vtkOpenGLRenderer::ReleaseGraphicsResources(vtkWindow *w)
     {
     this->DepthPeelingPass->ReleaseGraphicsResources(w);
     }
-  if (w && this->ShadowMapPass)
-    {
-    this->ShadowMapPass->ReleaseGraphicsResources(w);
-    }
+ // if (w && this->ShadowMapPass)
+ //   {
+ //   this->ShadowMapPass->ReleaseGraphicsResources(w);
+ //   }
   this->Superclass::ReleaseGraphicsResources(w);
 }
 
@@ -638,11 +638,11 @@ vtkOpenGLRenderer::~vtkOpenGLRenderer()
     this->Pass = NULL;
     }
 
-  if (this->ShadowMapPass)
-    {
-    this->ShadowMapPass->Delete();
-    this->ShadowMapPass = 0;
-    }
+//  if (this->ShadowMapPass)
+//    {
+//    this->ShadowMapPass->Delete();
+//    this->ShadowMapPass = 0;
+//    }
 
   if (this->DepthPeelingPass)
     {

@@ -449,18 +449,18 @@ void vtkOpenGLGPUVolumeRayCastMapper::vtkInternal::Initialize(
     this->RGBTables = new vtkOpenGLVolumeRGBTables(1);
     }
 
-  if (this->Parent->MaskInput != 0 &&
-      this->Parent->MaskType == LabelMapMaskType)
-    {
-    if(this->Mask1RGBTable == 0)
-      {
-      this->Mask1RGBTable = new vtkOpenGLVolumeRGBTable();
-      }
-    if(this->Mask2RGBTable == 0)
-      {
-      this->Mask2RGBTable = new vtkOpenGLVolumeRGBTable();
-      }
-    }
+//  if (this->Parent->MaskInput != 0 &&
+//      this->Parent->MaskType == LabelMapMaskType)
+//    {
+//    if(this->Mask1RGBTable == 0)
+//      {
+//      this->Mask1RGBTable = new vtkOpenGLVolumeRGBTable();
+//      }
+//    if(this->Mask2RGBTable == 0)
+//      {
+//      this->Mask2RGBTable = new vtkOpenGLVolumeRGBTable();
+//      }
+//    }
 
   // We support upto four components
   if (noOfComponents > 1 && independentComponents)
@@ -773,47 +773,47 @@ bool vtkOpenGLGPUVolumeRayCastMapper::vtkInternal::LoadVolume(
     sliceArray->SetNumberOfTuples(this->TextureSize[0] * this->TextureSize[1]);
     void* slicePtr = sliceArray->GetVoidPointer(0);
     int k = 0;
-    int kInc = (this->Dimensions[0] - this->Parent->CellFlag) *
-               (this->Dimensions[1] - this->Parent->CellFlag);
-    int kOffset = (this->Extents[4] *
-                  (this->Dimensions[1] - this->Parent->CellFlag) +
-                   this->Extents[2]) *
-                  (this->Dimensions[0] - this->Parent->CellFlag) +
-                   this->Extents[0];
-    float *tupPtr = new float [noOfComponents];
-    while(k < this->TextureSize[2])
-      {
-      int j = 0;
-      int jOffset = 0;
-      int jDestOffset = 0;
-      while(j < this->TextureSize[1])
-        {
-        i = 0;
-        while(i < this->TextureSize[0])
-          {
-          double * scalarPtr = scalars->GetTuple(kOffset + jOffset + i);
-          for (int n = 0; n < noOfComponents; ++n)
-            {
-            tupPtr[n] = scalarPtr[n]*scale[n] + bias[n];
-            }
-          sliceArray->SetTuple(jDestOffset + i, tupPtr);
-          ++i;
-          }
-        ++j;
-        jOffset += this->Dimensions[0] - this->Parent->CellFlag;
-        jDestOffset += this->TextureSize[0];
-        }
-
-      // Here we are assuming that GL_ARB_texture_non_power_of_two is
-      // available
-      glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, k,
-                      this->TextureSize[0], this->TextureSize[1], 1,
-                      format, type, slicePtr);
-      ++k;
-      kOffset += kInc;
-      }
-    delete [] tupPtr;
-    sliceArray->Delete();
+//    int kInc = (this->Dimensions[0] - this->Parent->CellFlag) *
+//               (this->Dimensions[1] - this->Parent->CellFlag);
+//    int kOffset = (this->Extents[4] *
+//                  (this->Dimensions[1] - this->Parent->CellFlag) +
+//                   this->Extents[2]) *
+//                  (this->Dimensions[0] - this->Parent->CellFlag) +
+//                   this->Extents[0];
+//    float *tupPtr = new float [noOfComponents];
+//    while(k < this->TextureSize[2])
+//      {
+//      int j = 0;
+//      int jOffset = 0;
+//      int jDestOffset = 0;
+//      while(j < this->TextureSize[1])
+//        {
+//        i = 0;
+//        while(i < this->TextureSize[0])
+//          {
+//          double * scalarPtr = scalars->GetTuple(kOffset + jOffset + i);
+//          for (int n = 0; n < noOfComponents; ++n)
+//            {
+//            tupPtr[n] = scalarPtr[n]*scale[n] + bias[n];
+//            }
+//          sliceArray->SetTuple(jDestOffset + i, tupPtr);
+//          ++i;
+//          }
+//        ++j;
+//        jOffset += this->Dimensions[0] - this->Parent->CellFlag;
+//        jDestOffset += this->TextureSize[0];
+//        }
+//
+//      // Here we are assuming that GL_ARB_texture_non_power_of_two is
+//      // available
+//      glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, k,
+//                      this->TextureSize[0], this->TextureSize[1], 1,
+//                      format, type, slicePtr);
+//      ++k;
+//      kOffset += kInc;
+//      }
+//    delete [] tupPtr;
+//    sliceArray->Delete();
     }
   // do not tie up the texture unit unless we are activly using it
   // textures can exist without being active
@@ -846,20 +846,20 @@ bool vtkOpenGLGPUVolumeRayCastMapper::vtkInternal::LoadMask(vtkRenderer* ren,
       mask = (*it2).second;
       }
 
-    mask->Update(ren,
-                 maskInput,
-                 this->Parent->CellFlag,
-                 textureExtent,
-                 this->Parent->ScalarMode,
-                 this->Parent->ArrayAccessMode,
-                 this->Parent->ArrayId,
-                 this->Parent->ArrayName,
-                 static_cast<vtkIdType>(static_cast<float>(
-                   this->Parent->MaxMemoryInBytes) *
-                   this->Parent->MaxMemoryFraction));
-
-    result = result && mask->IsLoaded();
-    this->CurrentMask = mask;
+//    mask->Update(ren,
+//                 maskInput,
+//                 this->Parent->CellFlag,
+//                 textureExtent,
+//                 this->Parent->ScalarMode,
+//                 this->Parent->ArrayAccessMode,
+//                 this->Parent->ArrayId,
+//                 this->Parent->ArrayName,
+//                 static_cast<vtkIdType>(static_cast<float>(
+//                   this->Parent->MaxMemoryInBytes) *
+//                   this->Parent->MaxMemoryFraction));
+//
+//    result = result && mask->IsLoaded();
+//    this->CurrentMask = mask;
     }
 
   return result;
@@ -916,31 +916,31 @@ void vtkOpenGLGPUVolumeRayCastMapper::vtkInternal::ComputeBounds(
   swapBounds[2] = (this->CellSpacing[2] < 0);
 
   // Loaded data represents points
-  if (!this->Parent->CellFlag)
-    {
-    // If spacing is negative, we may have to rethink the equation
-    // between real point and texture coordinate...
-    this->LoadedBounds[0] = origin[0] +
-      static_cast<double>(this->Extents[0 + swapBounds[0]]) *
-      this->CellSpacing[0];
-    this->LoadedBounds[2] = origin[1] +
-      static_cast<double>(this->Extents[2 + swapBounds[1]]) *
-      this->CellSpacing[1];
-    this->LoadedBounds[4] = origin[2] +
-      static_cast<double>(this->Extents[4 + swapBounds[2]]) *
-      this->CellSpacing[2];
-    this->LoadedBounds[1] = origin[0] +
-      static_cast<double>(this->Extents[1 - swapBounds[0]]) *
-      this->CellSpacing[0];
-    this->LoadedBounds[3] = origin[1] +
-      static_cast<double>(this->Extents[3 - swapBounds[1]]) *
-      this->CellSpacing[1];
-    this->LoadedBounds[5] = origin[2] +
-      static_cast<double>(this->Extents[5 - swapBounds[2]]) *
-      this->CellSpacing[2];
-    }
-  // Loaded extents represent cells
-  else
+//  if (!this->Parent->CellFlag)
+//    {
+//    // If spacing is negative, we may have to rethink the equation
+//    // between real point and texture coordinate...
+//    this->LoadedBounds[0] = origin[0] +
+//      static_cast<double>(this->Extents[0 + swapBounds[0]]) *
+//      this->CellSpacing[0];
+//    this->LoadedBounds[2] = origin[1] +
+//      static_cast<double>(this->Extents[2 + swapBounds[1]]) *
+//      this->CellSpacing[1];
+//    this->LoadedBounds[4] = origin[2] +
+//      static_cast<double>(this->Extents[4 + swapBounds[2]]) *
+//      this->CellSpacing[2];
+//    this->LoadedBounds[1] = origin[0] +
+//      static_cast<double>(this->Extents[1 - swapBounds[0]]) *
+//      this->CellSpacing[0];
+//    this->LoadedBounds[3] = origin[1] +
+//      static_cast<double>(this->Extents[3 - swapBounds[1]]) *
+//      this->CellSpacing[1];
+//    this->LoadedBounds[5] = origin[2] +
+//      static_cast<double>(this->Extents[5 - swapBounds[2]]) *
+//      this->CellSpacing[2];
+//    }
+//  // Loaded extents represent cells
+//  else
     {
     int wholeTextureExtent[6];
     input->GetExtent(wholeTextureExtent);
@@ -1086,22 +1086,22 @@ int vtkOpenGLGPUVolumeRayCastMapper::vtkInternal::UpdateInterpolationType(
 #endif
     vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow()));
 
-  if (this->Parent->MaskInput != 0 &&
-      this->Parent->MaskType == LabelMapMaskType)
-    {
-    vtkColorTransferFunction* colorTransferFunc =
-      volumeProperty->GetRGBTransferFunction(1);
-    this->Mask1RGBTable->Update(colorTransferFunc, scalarRange,
-                                vtkTextureObject::Nearest,
-                                vtkOpenGLRenderWindow::SafeDownCast(
-                                  ren->GetRenderWindow()));
+  //if (this->Parent->MaskInput != 0 &&
+  //    this->Parent->MaskType == LabelMapMaskType)
+  //  {
+  //  vtkColorTransferFunction* colorTransferFunc =
+  //    volumeProperty->GetRGBTransferFunction(1);
+  //  this->Mask1RGBTable->Update(colorTransferFunc, scalarRange,
+  //                              vtkTextureObject::Nearest,
+  //                              vtkOpenGLRenderWindow::SafeDownCast(
+  //                                ren->GetRenderWindow()));
 
-    colorTransferFunc = volumeProperty->GetRGBTransferFunction(2);
-    this->Mask2RGBTable->Update(colorTransferFunc, scalarRange,
-                                vtkTextureObject::Nearest,
-                                vtkOpenGLRenderWindow::SafeDownCast(
-                                  ren->GetRenderWindow()));
-    }
+  //  colorTransferFunc = volumeProperty->GetRGBTransferFunction(2);
+  //  this->Mask2RGBTable->Update(colorTransferFunc, scalarRange,
+  //                              vtkTextureObject::Nearest,
+  //                              vtkOpenGLRenderWindow::SafeDownCast(
+  //                                ren->GetRenderWindow()));
+  //  }
 
   return 0;
 }
@@ -1146,17 +1146,17 @@ int vtkOpenGLGPUVolumeRayCastMapper::vtkInternal::UpdateOpacityTransferFunction(
 
   int tableIndex = component < this->OpacityTables->GetNumberOfTables() ?
                    component : this->OpacityTables->GetNumberOfTables() - 1;
-  this->OpacityTables->GetTable(tableIndex)->Update(
-    scalarOpacity,this->Parent->BlendMode,
-    this->ActualSampleDistance,
-    scalarRange,
-    volumeProperty->GetScalarOpacityUnitDistance(component),
-#if GL_ES_VERSION_2_0 != 1
-    filterVal,
-#else
-    vtkTextureObject::Nearest,
-#endif
-    vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow()));
+//  this->OpacityTables->GetTable(tableIndex)->Update(
+//    scalarOpacity,this->Parent->BlendMode,
+//    this->ActualSampleDistance,
+//    scalarRange,
+//    volumeProperty->GetScalarOpacityUnitDistance(component),
+//#if GL_ES_VERSION_2_0 != 1
+//    filterVal,
+//#else
+//    vtkTextureObject::Nearest,
+//#endif
+//    vtkOpenGLRenderWindow::SafeDownCast(ren->GetRenderWindow()));
 
   return 0;
 }
@@ -1802,23 +1802,23 @@ void vtkOpenGLGPUVolumeRayCastMapper::vtkInternal::UpdateClipping(
     std::vector<float> clippingPlanes;
     // Currently we don't have any clipping plane
     clippingPlanes.push_back(0);
-
-    this->Parent->ClippingPlanes->InitTraversal();
+///
+//    this->Parent->ClippingPlanes->InitTraversal();
     vtkPlane* plane;
-    while ((plane = this->Parent->ClippingPlanes->GetNextItem()))
-      {
-      // Planes are in world coordinates
-      double planeOrigin[3], planeNormal[3];
-      plane->GetOrigin(planeOrigin);
-      plane->GetNormal(planeNormal);
-
-      clippingPlanes.push_back(planeOrigin[0]);
-      clippingPlanes.push_back(planeOrigin[1]);
-      clippingPlanes.push_back(planeOrigin[2]);
-      clippingPlanes.push_back(planeNormal[0]);
-      clippingPlanes.push_back(planeNormal[1]);
-      clippingPlanes.push_back(planeNormal[2]);
-      }
+//    while ((plane = this->Parent->ClippingPlanes->GetNextItem()))
+//      {
+//      // Planes are in world coordinates
+//      double planeOrigin[3], planeNormal[3];
+//      plane->GetOrigin(planeOrigin);
+//      plane->GetNormal(planeNormal);
+//
+//      clippingPlanes.push_back(planeOrigin[0]);
+//      clippingPlanes.push_back(planeOrigin[1]);
+//      clippingPlanes.push_back(planeOrigin[2]);
+//      clippingPlanes.push_back(planeNormal[0]);
+//      clippingPlanes.push_back(planeNormal[1]);
+//      clippingPlanes.push_back(planeNormal[2]);
+//      }
 
     double croppingRegionPlanes[6];
     this->Parent->GetCroppingRegionPlanes(croppingRegionPlanes);
@@ -1836,11 +1836,11 @@ void vtkOpenGLGPUVolumeRayCastMapper::vtkInternal::UpdateClipping(
 void vtkOpenGLGPUVolumeRayCastMapper::vtkInternal::UpdateSamplingDistance(
   vtkImageData* input, vtkRenderer* vtkNotUsed(ren), vtkVolume* vol)
 {
-  if (!this->Parent->AutoAdjustSampleDistances)
-    {
-    this->ActualSampleDistance = this->Parent->SampleDistance;
-    }
-  else
+//  if (!this->Parent->AutoAdjustSampleDistances)
+//    {
+//    this->ActualSampleDistance = this->Parent->SampleDistance;
+//    }
+//  else
     {
     input->GetSpacing(this->CellSpacing);
 

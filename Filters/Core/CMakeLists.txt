@@ -10,7 +10,7 @@ set(Module_SRCS
   vtkClipPolyData.cxx
   vtkCompositeDataProbeFilter.cxx
   vtkConnectivityFilter.cxx
-  vtkContourFilter.cxx
+#  vtkContourFilter.cxx
   vtkContourGrid.cxx
   vtkContourHelper.cxx
   vtkDataObjectGenerator.cxx
@@ -21,13 +21,13 @@ set(Module_SRCS
   vtkDecimatePro.cxx
   vtkDelaunay2D.cxx
   vtkDelaunay3D.cxx
-  vtkElevationFilter.cxx
+#  vtkElevationFilter.cxx
   vtkExecutionTimer.cxx
   vtkFeatureEdges.cxx
   vtkFieldDataToAttributeDataFilter.cxx
-  vtkFlyingEdges2D.cxx
-  vtkFlyingEdges3D.cxx
-  vtkFlyingEdgesPlaneCutter.cxx
+#  vtkFlyingEdges2D.cxx
+#  vtkFlyingEdges3D.cxx
+#  vtkFlyingEdgesPlaneCutter.cxx
   vtkGlyph2D.cxx
   vtkGlyph3D.cxx
   vtkHedgeHog.cxx
@@ -50,8 +50,8 @@ set(Module_SRCS
   vtkQuadricDecimation.cxx
   vtkRearrangeFields.cxx
   vtkReverseSense.cxx
-  vtkSimpleElevationFilter.cxx
-  vtkSmoothPolyDataFilter.cxx
+#  vtkSimpleElevationFilter.cxx
+#  vtkSmoothPolyDataFilter.cxx
   vtkStripper.cxx
   vtkStructuredGridOutlineFilter.cxx
   vtkSynchronizedTemplates2D.cxx
@@ -63,8 +63,8 @@ set(Module_SRCS
   vtkTransposeTable.cxx
   vtkTriangleFilter.cxx
   vtkTubeFilter.cxx
-  vtkVectorDot.cxx
-  vtkVectorNorm.cxx
+#  vtkVectorDot.cxx
+#  vtkVectorNorm.cxx
   vtkWindowedSincPolyDataFilter.cxx
 
   vtkCutter.cxx

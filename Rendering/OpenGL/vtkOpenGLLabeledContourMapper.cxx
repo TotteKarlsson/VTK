@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkOpenGL.h"
 #include "vtkOpenGLError.h"
-
+#include "vtkPolyDataMapper.h"
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkOpenGLLabeledContourMapper)
 

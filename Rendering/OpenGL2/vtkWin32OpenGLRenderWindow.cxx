@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 #include <math.h>
 #include <sstream>
-
+#include <cstdint>
 #include "vtkOpenGLError.h"
 
 // Mouse wheel support

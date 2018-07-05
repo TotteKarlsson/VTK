@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include <string.h>
 #include <math.h>
+#include <stdint.h>
 
 
 #ifndef _WIN32_WINNT

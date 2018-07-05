@@ -80,7 +80,9 @@ vtkDataArrayTemplate<T>::vtkDataArrayTemplate()
   this->TupleSize = 0;
   this->Tuple = 0;
   this->SaveUserArray = 0;
+#if !defined(__BORLANDC__)
   this->DeleteMethod = VTK_DATA_ARRAY_FREE;
+#endif  
   this->Lookup = 0;
   this->RebuildLookup = true;
 }
@@ -115,7 +117,9 @@ void vtkDataArrayTemplate<T>::SetArray(T* array,
   this->Size = size;
   this->MaxId = size-1;
   this->SaveUserArray = save;
-  this->DeleteMethod = deleteMethod;
+#if !defined(__BORLANDC__)
+    this->DeleteMethod = deleteMethod;
+#endif    
   this->DataChanged();
 }
 
@@ -207,17 +211,21 @@ void vtkDataArrayTemplate<T>::DeleteArray()
 {
   if ((this->Array) && (!this->SaveUserArray))
     {
+#if !defined(__BORLANDC__)
     if (this->DeleteMethod == VTK_DATA_ARRAY_FREE)
       {
       free(this->Array);
       }
     else
-      {
+#endif
+{
       delete[] this->Array;
       }
     }
   this->SaveUserArray = 0;
+#if !defined(__BORLANDC__)
   this->DeleteMethod = VTK_DATA_ARRAY_FREE;
+#endif  
   this->Array = 0;
 }
 
@@ -267,7 +275,9 @@ T* vtkDataArrayTemplate<T>::ResizeAndExtend(vtkIdType sz)
   if (this->Array
       &&
       (this->SaveUserArray
+#if !defined(__BORLANDC__)
        || this->DeleteMethod==VTK_DATA_ARRAY_DELETE
+#endif       
        || dontUseRealloc ))
     {
     newArray = static_cast<T*>(malloc(static_cast<size_t>(newSize)*sizeof(T)));

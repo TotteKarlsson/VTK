@@ -13,6 +13,7 @@
 
 =========================================================================*/
 
+#include <windows.h>
 #include "vtk_glew.h"
 
 #include "vtkImageProcessingPass.h"
