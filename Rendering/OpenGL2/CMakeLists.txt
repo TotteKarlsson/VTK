@@ -321,6 +321,10 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/vtkRenderingOpenGLConfigure.h.in
 # Set up some of the module specific preprocessor definitions.
 set(${vtk-module}_EXPORT_CODE "#include \"vtkRenderingOpenGLConfigure.h\"")
 
+
+#This allow succesfull linking with vtkglew for some reason (mtk)
+link_directories(${CMAKE_BINARY_DIR}/lib)
+
 vtk_module_library(${vtk-module} ${Module_SRCS})
 vtk_opengl_link(${vtk-module})
 if(VTK_USE_X)
