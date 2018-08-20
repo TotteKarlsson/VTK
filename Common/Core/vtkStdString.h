@@ -57,6 +57,14 @@ public:
   vtkStdString(const StdString& s, size_type pos=0, size_type n=npos):
     StdString(s, pos, n) {}
 
+    //vtkStdString& operator=(vtkStdString&& rhs)
+    //{
+    //    std::string::operator=(std::move(rhs));
+    //    return *this;
+    //}
+    //vtkStdString(vtkStdString&& s)
+    //{//only trying to compile.. not final code! }
+
   operator const char *() { return this->c_str(); }
 };
 
