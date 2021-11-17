@@ -27,6 +27,8 @@ if(NOT DEFINED CMAKE_MACOSX_RPATH)
 endif()
 
 project(VTK)
+#This allow succesfull linking with vtkglew for some reason (mtk)
+link_directories(${CMAKE_BINARY_DIR}/lib)
 
 # Objective-C++ compile flags.
 # CMake has no equivalent of CMAKE_CXX_FLAGS for Objective-C++ (bug #4756)

@@ -34,6 +34,7 @@ static const char *vtkMedicalImagePropertiesOrientationString[] = {
   NULL
 };
 
+using namespace std;
 
 //----------------------------------------------------------------------------
 class vtkMedicalImagePropertiesInternals

@@ -58,6 +58,8 @@
 namespace METAIO_NAMESPACE {
 #endif
 
+using std::isprint;
+using std::isspace;
 extern int META_DEBUG;
 
 // Types used for storing the compression table

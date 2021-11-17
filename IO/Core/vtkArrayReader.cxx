@@ -33,6 +33,7 @@
 
 vtkStandardNewMacro(vtkArrayReader);
 
+using std::isspace;
 namespace {
 
 template<typename ValueT>

@@ -23,6 +23,7 @@
 #include "vtkIntArray.h"
 #include <algorithm>
 
+using namespace std;
 inline void StdStringToUpper(std::string& s)
 {
   std::transform(s.begin(), s.end(), s.begin(), ::toupper);

@@ -45,6 +45,7 @@
 #define VTK_FTFC_DEBUG 0
 #define VTK_FTFC_DEBUG_CD 0
 
+using namespace std;
 namespace {
 // Some helper functions:
 void rotateVector2i(vtkVector2i &vec, float sinTheta, float cosTheta)

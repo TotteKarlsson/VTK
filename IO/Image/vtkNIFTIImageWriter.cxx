@@ -48,6 +48,7 @@ vtkCxxSetObjectMacro(vtkNIFTIImageWriter,QFormMatrix,vtkMatrix4x4);
 vtkCxxSetObjectMacro(vtkNIFTIImageWriter,SFormMatrix,vtkMatrix4x4);
 vtkCxxSetObjectMacro(vtkNIFTIImageWriter,NIFTIHeader,vtkNIFTIImageHeader);
 
+using namespace std;
 //----------------------------------------------------------------------------
 vtkNIFTIImageWriter::vtkNIFTIImageWriter()
 {

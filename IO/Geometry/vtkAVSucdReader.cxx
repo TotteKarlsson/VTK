@@ -40,7 +40,7 @@
 #include <map>
 
 vtkStandardNewMacro(vtkAVSucdReader);
-
+using namespace std;
 // Internal Classes/Structures
 struct vtkAVSucdReader::idMapping : public std::map<vtkIdType, vtkIdType>
 {};

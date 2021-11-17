@@ -53,6 +53,7 @@ float vtkWindBladeReader::DRY_AIR_CONSTANT = 287.04;
 int   vtkWindBladeReader::NUM_PART_SIDES = 4;  // Blade parts rhombus
 const int   vtkWindBladeReader::NUM_BASE_SIDES = 5;  // Base pyramid
 const int   vtkWindBladeReader::LINE_SIZE             = 256;
+const int   LINE_SIZE             = 256;
 int   vtkWindBladeReader::DIMENSION             = 3;
 int   vtkWindBladeReader::BYTES_PER_DATA = 4;
 int   vtkWindBladeReader::SCALAR  = 1;
@@ -621,6 +622,8 @@ bool vtkWindBladeReader::ReadGlobalData()
 // Read the field variable information
 //
 //----------------------------------------------------------------------------
+
+#define LINE_SIZE 256
 void vtkWindBladeReader::ReadDataVariables(istream& inStr)
 {
   char inBuf[LINE_SIZE];
@@ -1905,6 +1908,7 @@ void vtkWindBladeReader::ReadBladeData(std::stringstream &inStr)
   int firstPoint;
   int turbineID, lastTurbineID = 1, bladeID, partID;
   float x, y, z;
+  #define NUM_BASE_SIDES 5
   vtkIdType cell[NUM_BASE_SIDES];
 
   int linesRead = 0;
