@@ -4,6 +4,7 @@ endif()
 
 include(vtkOpenGL)
 include(vtkObjectFactory)
+#link_directories("d:\\emb_cmake\\bcc32\\vtk-fork\\lib")
 
 
 # The TDx support has not been moved, this header is here to define nothing,
@@ -324,9 +325,9 @@ set(${vtk-module}_EXPORT_CODE "#include \"vtkRenderingOpenGLConfigure.h\"")
 
 #This allow succesfull linking with vtkglew for some reason (mtk)
 message("link directory: " ${CMAKE_BINARY_DIR}/lib)
-link_directories(${CMAKE_BINARY_DIR})
-link_directories(${CMAKE_BINARY_DIR}/lib)
-message(${vtk-module})
+#link_directories("d:\\emb_cmake\\bcc32\\vtk-fork\\lib")
+#link_directories(${CMAKE_BINARY_DIR}/lib)
+message(${vtk-module} ${Module_SRCS})
 
 vtk_module_library(${vtk-module} ${Module_SRCS})
 vtk_opengl_link(${vtk-module})
